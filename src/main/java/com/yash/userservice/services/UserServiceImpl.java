@@ -6,6 +6,7 @@ import com.yash.userservice.dto.RatingDTO;
 import com.yash.userservice.dto.UserDTO;
 import com.yash.userservice.entities.User;
 import com.yash.userservice.exception.ResourceNotFoundException;
+import com.yash.userservice.external.service.feign.HotelClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,9 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private HotelClient hotelClient;
+
     @Override
     public User addUser(UserDTO userDTO) {
         String userID = UUID.randomUUID().toString();
@@ -43,9 +47,11 @@ public class UserServiceImpl implements UserService{
                 System.out.println("userId :"+user.getUserId()+" :: hotelId ::"+dto.getHotelId()+" :: ratingId "+dto.getRattingId());
             }
             List<RatingDTO> ratings = Arrays.asList(ratingDTO).stream().filter(r->(r.getHotelId()!=null && r.getHotelId()!="")).map((rating)->{
-                ResponseEntity<HotelDTO> entity = restTemplate.getForEntity("http://HOTEL-SERVICE/hotels/"+rating.getHotelId(), HotelDTO.class);
-                System.out.println("Sampleeee:"+entity.getBody().getHotelId());
-                rating.setHotel(entity.getBody());
+                //ResponseEntity<HotelDTO> entity = restTemplate.getForEntity("http://HOTEL-SERVICE/hotels/"+rating.getHotelId(), HotelDTO.class);
+                //System.out.println("Sampleeee:"+entity.getBody().getHotelId());
+
+                //rating.setHotel(entity.getBody());
+                rating.setHotel(hotelClient.getHotel(rating.getHotelId()));
                 return rating;
             }).collect(Collectors.toList());
 
