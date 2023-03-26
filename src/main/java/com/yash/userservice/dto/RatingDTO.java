@@ -16,5 +16,6 @@ public class RatingDTO {
     private String userId;
     private int rating;
     private String feedback;
+    private HotelDTO hotel;
 
 }
